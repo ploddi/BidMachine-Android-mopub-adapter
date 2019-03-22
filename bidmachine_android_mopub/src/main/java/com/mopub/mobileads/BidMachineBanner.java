@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.mopub.common.DataKeys;
 import com.mopub.common.logging.MoPubLog;
 import com.mopub.common.util.Views;
 
@@ -19,6 +20,24 @@ import io.bidmachine.utils.BMError;
 
 public class BidMachineBanner extends CustomEventBanner {
 
+//    {
+//        "seller_id": "1",
+//        "coppa": "true",
+//        "banner_width": "320",
+//        "userId": "user123",
+//        "gender": "F",
+//        "yob": "2000",
+//        "keywords": "Keyword_1,Keyword_2,Keyword_3,Keyword_4",
+//        "country": "Russia",
+//        "city": "Kirov",
+//        "zip": "610000",
+//        "sturl": "https://store_url.com",
+//        "paid": "true",
+//        "bcat": "IAB-1,IAB-3,IAB-5",
+//        "badv": "https://domain_1.com,https://domain_2.org",
+//        "bapps": "application_1,application_2,application_3"
+//    }
+
     private static final String ADAPTER_NAME = BidMachineBanner.class.getSimpleName();
     private static final String BANNER_WIDTH = "banner_width";
 
@@ -33,9 +52,15 @@ public class BidMachineBanner extends CustomEventBanner {
         setAutomaticImpressionAndClickTracking(false);
         customBannerListener = customEventBannerListener;
 
-        BannerSize bannerSize = findBannerSize(serverExtras);
+        BannerSize bannerSize = findBannerSize(serverExtras, BANNER_WIDTH);
         if (bannerSize == null) {
-            bannerSize = findBannerSize(localExtras);
+            bannerSize = findBannerSize(localExtras, BANNER_WIDTH);
+        }
+        if (bannerSize == null) {
+            bannerSize = findBannerSize(serverExtras, DataKeys.AD_WIDTH);
+        }
+        if (bannerSize == null) {
+            bannerSize = findBannerSize(localExtras, DataKeys.AD_WIDTH);
         }
         if (bannerSize == null) {
             MoPubLog.log(MoPubLog.AdapterLogEvent.CUSTOM,
@@ -51,8 +76,7 @@ public class BidMachineBanner extends CustomEventBanner {
             return;
         }
 
-        BidMachineUtils.initialize(context, serverExtras);
-        BidMachineUtils.updateGDPR();
+        BidMachineUtils.initialize(context, serverExtras, localExtras);
         BannerRequest.Builder bannerRequestBuilder = new BannerRequest.Builder()
                 .setSize(bannerSize);
         TargetingParams targetingParams = BidMachineUtils.findTargetingParams(localExtras);
@@ -86,7 +110,7 @@ public class BidMachineBanner extends CustomEventBanner {
         customBannerListener = null;
     }
 
-    private <T> BannerSize findBannerSize(@Nullable Map<String, T> extras) {
+    private <T> BannerSize findBannerSize(@Nullable Map<String, T> extras, String key) {
         if (extras == null) {
             return null;
         }

@@ -15,7 +15,6 @@ import io.bidmachine.BidMachine;
 
 public class BidMachineAdapterConfiguration extends BaseAdapterConfiguration {
 
-    private static final String ADAPTER_NAME = BidMachineAdapterConfiguration.class.getSimpleName();
     private static final String NETWORK_VERSION = BidMachine.VERSION;
     private static final String ADAPTER_VERSION = NETWORK_VERSION + ".0";
     private static final String MOPUB_NETWORK_NAME = "BidMachine";
@@ -59,21 +58,11 @@ public class BidMachineAdapterConfiguration extends BaseAdapterConfiguration {
             if (!TextUtils.isEmpty(testMode)) {
                 BidMachine.setTestMode(Boolean.parseBoolean(testMode));
             }
-            if (BidMachineUtils.initialize(context, configuration)) {
-                listener.onNetworkInitializationFinished(
-                        BidMachineAdapterConfiguration.class,
-                        MoPubErrorCode.ADAPTER_INITIALIZATION_SUCCESS
-                );
-                return;
-            }
+            BidMachineUtils.storeSellerId(configuration);
         }
-
-        MoPubLog.log(MoPubLog.AdapterLogEvent.CUSTOM,
-                ADAPTER_NAME,
-                "seller_id not found! BidMachine not initialized");
         listener.onNetworkInitializationFinished(
                 BidMachineAdapterConfiguration.class,
-                MoPubErrorCode.ADAPTER_CONFIGURATION_ERROR
+                MoPubErrorCode.ADAPTER_INITIALIZATION_SUCCESS
         );
     }
 }

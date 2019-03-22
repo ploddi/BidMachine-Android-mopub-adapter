@@ -6,7 +6,11 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.mopub.common.MoPub;
+import com.mopub.common.logging.MoPubLog;
 import com.mopub.common.privacy.PersonalInfoManager;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.util.Map;
 
@@ -20,19 +24,38 @@ class BidMachineUtils {
 
     private static final String SELLER_ID = "seller_id";
     private static final String COPPA = "coppa";
+    private static String sellerId;
 
-    static boolean initialize(Context context, Map<String, String> extras) {
-        String sellerId = extras.get(SELLER_ID);
-        String coppa = extras.get(COPPA);
-        return initialize(context, sellerId, coppa);
+    static void storeSellerId(@NonNull Map<String, String> configuration) {
+        sellerId = configuration.get(SELLER_ID);
     }
 
-    static boolean initialize(Context context, String sellerId, String coppa) {
-        if (!TextUtils.isEmpty(sellerId)) {
+    //TODO добавить метод BidMachine.isInitialized()
+    static boolean initialize(Context context, Map<String, String> serverExtras, Map<String, Object> localExtras) {
+        String coppa = serverExtras.get(COPPA);
+        if (TextUtils.isEmpty(coppa)) {
+            coppa = (String) localExtras.get(COPPA);
+        }
+        if (!TextUtils.isEmpty(coppa)) {
             BidMachine.setCoppa(Boolean.parseBoolean(coppa));
+        }
+
+        String sellerId = serverExtras.get(SELLER_ID);
+        if (TextUtils.isEmpty(sellerId)) {
+            sellerId = (String) localExtras.get(SELLER_ID);
+        }
+        if (TextUtils.isEmpty(sellerId)) {
+            sellerId = BidMachineUtils.sellerId;
+        }
+        if (!TextUtils.isEmpty(sellerId)) {
             BidMachineUtils.updateGDPR();
             BidMachine.initialize(context, sellerId);
             return true;
+        } else {
+            MoPubLog.log(
+                    MoPubLog.AdapterLogEvent.CUSTOM,
+                    BidMachineUtils.class.getSimpleName(),
+                    "seller_id not found anywhere (serverExtras, localExtras, configuration). BidMachine not initialized");
         }
         return false;
     }
@@ -129,8 +152,26 @@ class BidMachineUtils {
             return null;
         }
 
-        PriceFloorParams priceFloorParams = new PriceFloorParams();
-        return priceFloorParams;
+//        JSONArray jsonArray = new JSONArray();
+//        try {
+//            jsonArray.put(new JSONObject().put("id1", "1"));
+//            jsonArray.put(new JSONObject().put("id1", "1.2"));
+//            jsonArray.put(new JSONObject().put("id2", "20,04"));
+//            jsonArray.put(new JSONObject().put("id3", 300.006));
+//            jsonArray.put(new JSONObject().put("id4", 1000));
+//            jsonArray.put("1");
+//            jsonArray.put("1.2");
+//            jsonArray.put("20,04");
+//            jsonArray.put(300.006);
+//            jsonArray.put(1000);
+//        } catch (Exception ignore) {
+//
+//        }
+//        Map<String, String> extraData = new HashMap<>();
+//        extraData.put("priceFloors", jsonArray.toString());
+
+        String priceFloors = (String) extras.get("priceFloors");
+        return createPriceFloorParams(priceFloors);
     }
 
     private static Gender parseGender(String ortbValue) {
@@ -163,6 +204,34 @@ class BidMachineUtils {
         } catch (Exception e) {
             return new String[0];
         }
+    }
+
+    private static PriceFloorParams createPriceFloorParams(String jsonArrayString) {
+        PriceFloorParams priceFloorParams = new PriceFloorParams();
+        if (TextUtils.isEmpty(jsonArrayString)) {
+            return priceFloorParams;
+        }
+
+        try {
+            JSONArray jsonArray = new JSONArray(jsonArrayString);
+            for (int i = 0; i < jsonArray.length(); i++) {
+                Object object = jsonArray.opt(i);
+                if (object instanceof Double) {
+                    priceFloorParams.addPriceFloor((Double) object);
+                } else if (object instanceof JSONObject) {
+                    JSONObject jsonObject = (JSONObject) object;
+                    String id = jsonObject.optString("id");
+                    double price = jsonObject.optDouble("price", -1);
+                    if (!TextUtils.isEmpty(id) && price >= 0) {
+                        priceFloorParams.addPriceFloor(id, price);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            return new PriceFloorParams();
+        }
+
+        return priceFloorParams;
     }
 
 }

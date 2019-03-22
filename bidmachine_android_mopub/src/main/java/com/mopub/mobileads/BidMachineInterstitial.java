@@ -17,6 +17,24 @@ import io.bidmachine.utils.BMError;
 
 public class BidMachineInterstitial extends CustomEventInterstitial {
 
+//    {
+//        "seller_id": "1",
+//        "coppa": "true",
+//        "ad_content_type": "All",
+//        "userId": "user123",
+//        "gender": "F",
+//        "yob": "2000",
+//        "keywords": "Keyword_1,Keyword_2,Keyword_3,Keyword_4",
+//        "country": "Russia",
+//        "city": "Kirov",
+//        "zip": "610000",
+//        "sturl": "https://store_url.com",
+//        "paid": "true",
+//        "bcat": "IAB-1,IAB-3,IAB-5",
+//        "badv": "https://domain_1.com,https://domain_2.org",
+//        "bapps": "application_1,application_2,application_3"
+//    }
+
     private static final String ADAPTER_NAME = BidMachineInterstitial.class.getSimpleName();
     private static final String AD_CONTENT_TYPE = "ad_content_type";
 
@@ -31,8 +49,7 @@ public class BidMachineInterstitial extends CustomEventInterstitial {
         setAutomaticImpressionAndClickTracking(false);
         customInterstitialListener = customEventInterstitialListener;
 
-        BidMachineUtils.initialize(context, serverExtras);
-        BidMachineUtils.updateGDPR();
+        BidMachineUtils.initialize(context, serverExtras, localExtras);
         InterstitialRequest.Builder interstitialRequestBuilder = new InterstitialRequest.Builder();
         AdContentType adContentType = findAdContentType(serverExtras);
         if (adContentType != null) {

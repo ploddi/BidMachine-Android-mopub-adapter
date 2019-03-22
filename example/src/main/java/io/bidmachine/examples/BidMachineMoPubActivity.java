@@ -29,7 +29,7 @@ import java.util.Set;
 public class BidMachineMoPubActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
-    private static final String BANNER_KEY = "b195f8dd8ded45fe847ad89ed1d016da";
+    private static final String BANNER_KEY = "4068bca9a3a44977917d68338b75df64";
     private static final String INTERSTITIAL_KEY = "b195f8dd8ded45fe847ad89ed1d016da";
     private static final String REWARDED_KEY = "b195f8dd8ded45fe847ad89ed1d016da";
 

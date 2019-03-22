@@ -3,7 +3,6 @@ package com.mopub.mobileads;
 import android.app.Activity;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.text.TextUtils;
 
 import com.mopub.common.LifecycleListener;
 import com.mopub.common.MoPubReward;
@@ -20,9 +19,24 @@ import io.bidmachine.utils.BMError;
 
 public class BidMachineRewardedVideo extends CustomEventRewardedVideo {
 
+//    {
+//        "seller_id": "1",
+//        "coppa": "true",
+//        "userId": "user123",
+//        "gender": "F",
+//        "yob": "2000",
+//        "keywords": "Keyword_1,Keyword_2,Keyword_3,Keyword_4",
+//        "country": "Russia",
+//        "city": "Kirov",
+//        "zip": "610000",
+//        "sturl": "https://store_url.com",
+//        "paid": "true",
+//        "bcat": "IAB-1,IAB-3,IAB-5",
+//        "badv": "https://domain_1.com,https://domain_2.org",
+//        "bapps": "application_1,application_2,application_3"
+//    }
+
     private static final String ADAPTER_NAME = BidMachineRewardedVideo.class.getSimpleName();
-    private static final String SELLER_ID = "seller_id";
-    private static final String COPPA = "coppa";
 
     private RewardedAd rewardedAd;
 
@@ -34,22 +48,7 @@ public class BidMachineRewardedVideo extends CustomEventRewardedVideo {
 
     @Override
     protected boolean checkAndInitializeSdk(@NonNull Activity launcherActivity, @NonNull Map<String, Object> localExtras, @NonNull Map<String, String> serverExtras) throws Exception {
-        String sellerId = serverExtras.get(SELLER_ID);
-        if (TextUtils.isEmpty(sellerId)) {
-            sellerId = (String) localExtras.get(SELLER_ID);
-        }
-        String coppa = serverExtras.get(COPPA);
-        if (TextUtils.isEmpty(coppa)) {
-            coppa = (String) localExtras.get(COPPA);
-        }
-        if (BidMachineUtils.initialize(launcherActivity, sellerId, coppa)) {
-            return true;
-        }
-
-        MoPubLog.log(MoPubLog.AdapterLogEvent.CUSTOM,
-                ADAPTER_NAME,
-                "seller_id not found! BidMachine not initialized");
-        return false;
+        return BidMachineUtils.initialize(launcherActivity, serverExtras, localExtras);
     }
 
     @Override
