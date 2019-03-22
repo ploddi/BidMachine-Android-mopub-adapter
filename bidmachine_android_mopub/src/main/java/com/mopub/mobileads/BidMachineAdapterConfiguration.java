@@ -19,8 +19,6 @@ public class BidMachineAdapterConfiguration extends BaseAdapterConfiguration {
     private static final String NETWORK_VERSION = BidMachine.VERSION;
     private static final String ADAPTER_VERSION = NETWORK_VERSION + ".0";
     private static final String MOPUB_NETWORK_NAME = "BidMachine";
-    private static final String SELLER_ID = "seller_id";
-    private static final String COPPA = "coppa";
     private static final String LOGGING_ENABLED = "logging_enabled";
     private static final String TEST_MODE = "test_mode";
 
@@ -61,9 +59,7 @@ public class BidMachineAdapterConfiguration extends BaseAdapterConfiguration {
             if (!TextUtils.isEmpty(testMode)) {
                 BidMachine.setTestMode(Boolean.parseBoolean(testMode));
             }
-            String sellerId = configuration.get(SELLER_ID);
-            String coppa = configuration.get(COPPA);
-            if (BidMachineUtils.initialize(context, sellerId, coppa)) {
+            if (BidMachineUtils.initialize(context, configuration)) {
                 listener.onNetworkInitializationFinished(
                         BidMachineAdapterConfiguration.class,
                         MoPubErrorCode.ADAPTER_INITIALIZATION_SUCCESS

@@ -31,6 +31,7 @@ public class BidMachineInterstitial extends CustomEventInterstitial {
         setAutomaticImpressionAndClickTracking(false);
         customInterstitialListener = customEventInterstitialListener;
 
+        BidMachineUtils.initialize(context, serverExtras);
         BidMachineUtils.updateGDPR();
         InterstitialRequest.Builder interstitialRequestBuilder = new InterstitialRequest.Builder();
         AdContentType adContentType = findAdContentType(serverExtras);

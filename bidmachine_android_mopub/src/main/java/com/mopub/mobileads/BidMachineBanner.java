@@ -51,6 +51,7 @@ public class BidMachineBanner extends CustomEventBanner {
             return;
         }
 
+        BidMachineUtils.initialize(context, serverExtras);
         BidMachineUtils.updateGDPR();
         BannerRequest.Builder bannerRequestBuilder = new BannerRequest.Builder()
                 .setSize(bannerSize);

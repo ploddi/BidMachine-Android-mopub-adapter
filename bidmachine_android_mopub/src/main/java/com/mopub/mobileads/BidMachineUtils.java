@@ -18,6 +18,15 @@ import io.bidmachine.utils.Gender;
 
 class BidMachineUtils {
 
+    private static final String SELLER_ID = "seller_id";
+    private static final String COPPA = "coppa";
+
+    static boolean initialize(Context context, Map<String, String> extras) {
+        String sellerId = extras.get(SELLER_ID);
+        String coppa = extras.get(COPPA);
+        return initialize(context, sellerId, coppa);
+    }
+
     static boolean initialize(Context context, String sellerId, String coppa) {
         if (!TextUtils.isEmpty(sellerId)) {
             BidMachine.setCoppa(Boolean.parseBoolean(coppa));
@@ -25,7 +34,6 @@ class BidMachineUtils {
             BidMachine.initialize(context, sellerId);
             return true;
         }
-
         return false;
     }
 
@@ -74,7 +82,8 @@ class BidMachineUtils {
      * extraData.put("paid", "true");
      * extraData.put("bcat", "IAB-1,IAB-3,IAB-5");
      * extraData.put("badv", "https://domain_1.com,https://domain_2.org");
-     * extraData.put("bapps", "application_1,application_2,application_3");*/
+     * extraData.put("bapps", "application_1,application_2,application_3");
+     */
     static TargetingParams findTargetingParams(@Nullable Map<String, Object> extras) {
         if (extras == null) {
             return null;
