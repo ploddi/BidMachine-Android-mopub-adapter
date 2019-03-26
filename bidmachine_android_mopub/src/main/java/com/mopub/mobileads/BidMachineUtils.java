@@ -12,8 +12,10 @@ import com.mopub.common.privacy.PersonalInfoManager;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Map;
 
 import io.bidmachine.BidMachine;
@@ -265,7 +267,7 @@ class BidMachineUtils {
         }
     }
 
-    private static String parseString(Object object) {
+    static String parseString(Object object) {
         if (object instanceof String) {
             return (String) object;
         } else {
@@ -361,11 +363,12 @@ class BidMachineUtils {
 
     private static double convertToPrice(String value) {
         if (!TextUtils.isEmpty(value)) {
-            value = value
-                    .replace(",", ".")
-                    .replace(" ", "");
             try {
-                return Double.parseDouble(value);
+                if (value.lastIndexOf('.') > value.lastIndexOf(',')) {
+                    return NumberFormat.getInstance(Locale.TAIWAN).parse(value).doubleValue();
+                } else {
+                    return NumberFormat.getInstance().parse(value).doubleValue();
+                }
             } catch (Exception e) {
                 return -1;
             }

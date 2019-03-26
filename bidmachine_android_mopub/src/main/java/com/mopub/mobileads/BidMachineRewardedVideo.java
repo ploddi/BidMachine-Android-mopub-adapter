@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.mopub.common.DataKeys;
 import com.mopub.common.LifecycleListener;
 import com.mopub.common.MoPubReward;
 import com.mopub.common.logging.MoPubLog;
@@ -20,6 +21,7 @@ public class BidMachineRewardedVideo extends CustomEventRewardedVideo {
     private static final String ADAPTER_NAME = BidMachineRewardedVideo.class.getSimpleName();
 
     private RewardedAd rewardedAd;
+    private String adUnitId = "";
 
     @Nullable
     @Override
@@ -37,6 +39,10 @@ public class BidMachineRewardedVideo extends CustomEventRewardedVideo {
     @Override
     protected void loadWithSdkInitialized(@NonNull Activity activity, @NonNull Map<String, Object> localExtras, @NonNull Map<String, String> serverExtras) throws Exception {
         Map<String, Object> fusedMap = BidMachineUtils.getFusedMap(serverExtras, localExtras);
+        String adUnitId = BidMachineUtils.parseString(fusedMap.get(DataKeys.AD_UNIT_ID_KEY));
+        if (adUnitId != null) {
+            this.adUnitId = adUnitId;
+        }
         BidMachineUtils.prepareBidMachine(activity, fusedMap);
         RewardedRequest rewardedRequest = new RewardedRequest.Builder()
                 .setTargetingParams(BidMachineUtils.findTargetingParams(fusedMap))
@@ -55,7 +61,7 @@ public class BidMachineRewardedVideo extends CustomEventRewardedVideo {
     @NonNull
     @Override
     protected String getAdNetworkId() {
-        return "";
+        return adUnitId;
     }
 
     @Override
