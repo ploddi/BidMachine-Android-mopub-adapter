@@ -10,8 +10,6 @@ import com.mopub.common.util.Views;
 
 import java.util.Map;
 
-import io.bidmachine.PriceFloorParams;
-import io.bidmachine.TargetingParams;
 import io.bidmachine.banner.BannerListener;
 import io.bidmachine.banner.BannerRequest;
 import io.bidmachine.banner.BannerSize;
@@ -19,24 +17,6 @@ import io.bidmachine.banner.BannerView;
 import io.bidmachine.utils.BMError;
 
 public class BidMachineBanner extends CustomEventBanner {
-
-//    {
-//        "seller_id": "1",
-//        "coppa": "true",
-//        "banner_width": "320",
-//        "userId": "user123",
-//        "gender": "F",
-//        "yob": "2000",
-//        "keywords": "Keyword_1,Keyword_2,Keyword_3,Keyword_4",
-//        "country": "Russia",
-//        "city": "Kirov",
-//        "zip": "610000",
-//        "sturl": "https://store_url.com",
-//        "paid": "true",
-//        "bcat": "IAB-1,IAB-3,IAB-5",
-//        "badv": "https://domain_1.com,https://domain_2.org",
-//        "bapps": "application_1,application_2,application_3"
-//    }
 
     private static final String ADAPTER_NAME = BidMachineBanner.class.getSimpleName();
     private static final String BANNER_WIDTH = "banner_width";
@@ -52,15 +32,10 @@ public class BidMachineBanner extends CustomEventBanner {
         setAutomaticImpressionAndClickTracking(false);
         customBannerListener = customEventBannerListener;
 
-        BannerSize bannerSize = findBannerSize(serverExtras, BANNER_WIDTH);
+        Map<String, Object> fusedMap = BidMachineUtils.getFusedMap(serverExtras, localExtras);
+        BannerSize bannerSize = findBannerSize(fusedMap, BANNER_WIDTH);
         if (bannerSize == null) {
-            bannerSize = findBannerSize(localExtras, BANNER_WIDTH);
-        }
-        if (bannerSize == null) {
-            bannerSize = findBannerSize(serverExtras, DataKeys.AD_WIDTH);
-        }
-        if (bannerSize == null) {
-            bannerSize = findBannerSize(localExtras, DataKeys.AD_WIDTH);
+            bannerSize = findBannerSize(fusedMap, DataKeys.AD_WIDTH);
         }
         if (bannerSize == null) {
             MoPubLog.log(MoPubLog.AdapterLogEvent.CUSTOM,
@@ -76,21 +51,16 @@ public class BidMachineBanner extends CustomEventBanner {
             return;
         }
 
-        BidMachineUtils.initialize(context, serverExtras, localExtras);
-        BannerRequest.Builder bannerRequestBuilder = new BannerRequest.Builder()
-                .setSize(bannerSize);
-        TargetingParams targetingParams = BidMachineUtils.findTargetingParams(localExtras);
-        if (targetingParams != null) {
-            bannerRequestBuilder.setTargetingParams(targetingParams);
-        }
-        PriceFloorParams priceFloorParams = BidMachineUtils.findPriceFloorParams(localExtras);
-        if (priceFloorParams != null) {
-            bannerRequestBuilder.setPriceFloorParams(priceFloorParams);
-        }
+        BidMachineUtils.prepareBidMachine(context, fusedMap);
+        BannerRequest bannerRequest = new BannerRequest.Builder()
+                .setSize(bannerSize)
+                .setTargetingParams(BidMachineUtils.findTargetingParams(fusedMap))
+                .setPriceFloorParams(BidMachineUtils.findPriceFloorParams(fusedMap))
+                .build();
 
         bannerView = new BannerView(context);
         bannerView.setListener(new BidMachineAdListener());
-        bannerView.load(bannerRequestBuilder.build());
+        bannerView.load(bannerRequest);
 
         MoPubLog.log(
                 MoPubLog.AdapterLogEvent.LOAD_ATTEMPTED,
@@ -115,18 +85,7 @@ public class BidMachineBanner extends CustomEventBanner {
             return null;
         }
 
-        int width = 0;
-        try {
-            Object value = extras.get(BANNER_WIDTH);
-            if (value instanceof Integer) {
-                width = (int) value;
-            } else if (value instanceof String) {
-                width = Integer.parseInt((String) value);
-            }
-        } catch (Exception e) {
-            return null;
-        }
-
+        int width = BidMachineUtils.parseInteger(extras.get(key));
         switch (width) {
             case 300:
                 return BannerSize.Size_300_250;

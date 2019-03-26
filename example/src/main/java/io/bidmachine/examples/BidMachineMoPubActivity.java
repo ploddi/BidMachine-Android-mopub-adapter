@@ -29,9 +29,10 @@ import java.util.Set;
 public class BidMachineMoPubActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
+    private static final String AD_UNIT_ID = "4068bca9a3a44977917d68338b75df64";
     private static final String BANNER_KEY = "4068bca9a3a44977917d68338b75df64";
-    private static final String INTERSTITIAL_KEY = "b195f8dd8ded45fe847ad89ed1d016da";
-    private static final String REWARDED_KEY = "b195f8dd8ded45fe847ad89ed1d016da";
+    private static final String INTERSTITIAL_KEY = "6173ac5e48de4a8b9741571f93d9c04e";
+    private static final String REWARDED_KEY = "e746b899b7d54a5d980d627626422c25";
 
     private Button btnLoadBanner;
     private Button btnShowBanner;
@@ -118,27 +119,12 @@ public class BidMachineMoPubActivity extends AppCompatActivity {
             //Prepare configuration map for BidMachineAdapterConfiguration
             Map<String, String> configuration = new HashMap<>();
             configuration.put("seller_id", "1");
+            configuration.put("coppa", "true");
             configuration.put("logging_enabled", "true");
             configuration.put("test_mode", "true");
 
-//        try {
-//            MoPubView view = new MoPubView(this);
-//
-//            view.setLocalExtras(new HashMap<String, Object>() {{
-//                put("priceFloors", new JSONArray()
-//                        .put(new JSONObject().put("id", 100000000))
-//                        .put(10000)
-//                        .toString());
-//                put("bcat", new JSONArray().put("cat1").put("cat2").toString());
-//            }});
-//
-//
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
-
             //Prepare SdkConfiguration for initialize MoPub with BidMachineAdapterConfiguration
-            SdkConfiguration sdkConfiguration = new SdkConfiguration.Builder(BANNER_KEY)
+            SdkConfiguration sdkConfiguration = new SdkConfiguration.Builder(AD_UNIT_ID)
                     .withAdditionalNetwork(BidMachineAdapterConfiguration.class.getName())
                     .withMediatedNetworkConfiguration(
                             BidMachineAdapterConfiguration.class.getName(),
@@ -225,8 +211,13 @@ public class BidMachineMoPubActivity extends AppCompatActivity {
 
         Log.d(TAG, "MoPubInterstitial loadInterstitial");
 
+        //Prepare localExtras for set to MoPubInterstitial
+        Map<String, Object> localExtras = new HashMap<>();
+        localExtras.put("ad_content_type", "All");
+
         //Create new MoPubInterstitial instance and load
         moPubInterstitial = new MoPubInterstitial(this, INTERSTITIAL_KEY);
+        moPubInterstitial.setLocalExtras(localExtras);
         moPubInterstitial.setInterstitialAdListener(new InterstitialListener());
         moPubInterstitial.load();
     }

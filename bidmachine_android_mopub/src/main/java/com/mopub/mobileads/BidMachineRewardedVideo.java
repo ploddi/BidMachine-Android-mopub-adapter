@@ -10,31 +10,12 @@ import com.mopub.common.logging.MoPubLog;
 
 import java.util.Map;
 
-import io.bidmachine.PriceFloorParams;
-import io.bidmachine.TargetingParams;
 import io.bidmachine.rewarded.RewardedAd;
 import io.bidmachine.rewarded.RewardedListener;
 import io.bidmachine.rewarded.RewardedRequest;
 import io.bidmachine.utils.BMError;
 
 public class BidMachineRewardedVideo extends CustomEventRewardedVideo {
-
-//    {
-//        "seller_id": "1",
-//        "coppa": "true",
-//        "userId": "user123",
-//        "gender": "F",
-//        "yob": "2000",
-//        "keywords": "Keyword_1,Keyword_2,Keyword_3,Keyword_4",
-//        "country": "Russia",
-//        "city": "Kirov",
-//        "zip": "610000",
-//        "sturl": "https://store_url.com",
-//        "paid": "true",
-//        "bcat": "IAB-1,IAB-3,IAB-5",
-//        "badv": "https://domain_1.com,https://domain_2.org",
-//        "bapps": "application_1,application_2,application_3"
-//    }
 
     private static final String ADAPTER_NAME = BidMachineRewardedVideo.class.getSimpleName();
 
@@ -48,25 +29,23 @@ public class BidMachineRewardedVideo extends CustomEventRewardedVideo {
 
     @Override
     protected boolean checkAndInitializeSdk(@NonNull Activity launcherActivity, @NonNull Map<String, Object> localExtras, @NonNull Map<String, String> serverExtras) throws Exception {
-        return BidMachineUtils.initialize(launcherActivity, serverExtras, localExtras);
+        return BidMachineUtils.prepareBidMachine(
+                launcherActivity,
+                BidMachineUtils.getFusedMap(serverExtras, localExtras));
     }
 
     @Override
     protected void loadWithSdkInitialized(@NonNull Activity activity, @NonNull Map<String, Object> localExtras, @NonNull Map<String, String> serverExtras) throws Exception {
-        BidMachineUtils.updateGDPR();
-        RewardedRequest.Builder rewardedRequestBuilder = new RewardedRequest.Builder();
-        TargetingParams targetingParams = BidMachineUtils.findTargetingParams(localExtras);
-        if (targetingParams != null) {
-            rewardedRequestBuilder.setTargetingParams(targetingParams);
-        }
-        PriceFloorParams priceFloorParams = BidMachineUtils.findPriceFloorParams(localExtras);
-        if (priceFloorParams != null) {
-            rewardedRequestBuilder.setPriceFloorParams(priceFloorParams);
-        }
+        Map<String, Object> fusedMap = BidMachineUtils.getFusedMap(serverExtras, localExtras);
+        BidMachineUtils.prepareBidMachine(activity, fusedMap);
+        RewardedRequest rewardedRequest = new RewardedRequest.Builder()
+                .setTargetingParams(BidMachineUtils.findTargetingParams(fusedMap))
+                .setPriceFloorParams(BidMachineUtils.findPriceFloorParams(fusedMap))
+                .build();
 
         rewardedAd = new RewardedAd(activity);
         rewardedAd.setListener(new BidMachineAdListener());
-        rewardedAd.load(rewardedRequestBuilder.build());
+        rewardedAd.load(rewardedRequest);
 
         MoPubLog.log(
                 MoPubLog.AdapterLogEvent.LOAD_ATTEMPTED,
@@ -76,9 +55,7 @@ public class BidMachineRewardedVideo extends CustomEventRewardedVideo {
     @NonNull
     @Override
     protected String getAdNetworkId() {
-        return rewardedAd != null && rewardedAd.getAuctionResult() != null
-                ? rewardedAd.getAuctionResult().getId()
-                : "";
+        return "";
     }
 
     @Override

@@ -12,6 +12,8 @@ import com.mopub.common.privacy.PersonalInfoManager;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import io.bidmachine.BidMachine;
@@ -24,42 +26,56 @@ class BidMachineUtils {
 
     private static final String SELLER_ID = "seller_id";
     private static final String COPPA = "coppa";
-    private static String sellerId;
+    private static final String LOGGING_ENABLED = "logging_enabled";
+    private static final String TEST_MODE = "test_mode";
+    private static Map<String, String> configuration;
+    private static boolean isInitialized = false;
 
-    static void storeSellerId(@NonNull Map<String, String> configuration) {
-        sellerId = configuration.get(SELLER_ID);
+    static void storeConfiguration(@NonNull Map<String, String> configuration) {
+        BidMachineUtils.configuration = configuration;
     }
 
-    //TODO добавить метод BidMachine.isInitialized()
-    static boolean initialize(Context context, Map<String, String> serverExtras, Map<String, Object> localExtras) {
-        String coppa = serverExtras.get(COPPA);
-        if (TextUtils.isEmpty(coppa)) {
-            coppa = (String) localExtras.get(COPPA);
+    /**
+     * @param extras - map where are seller_id, coppa, logging_enabled, test_mode
+     * @return was initialize or not
+     */
+    static <T> boolean prepareBidMachine(Context context, @NonNull Map<String, T> extras) {
+        Boolean loggingEnabled = parseBoolean(extras.get(LOGGING_ENABLED));
+        if (loggingEnabled != null) {
+            BidMachine.setLoggingEnabled(loggingEnabled);
         }
-        if (!TextUtils.isEmpty(coppa)) {
-            BidMachine.setCoppa(Boolean.parseBoolean(coppa));
+        Boolean testMode = parseBoolean(extras.get(TEST_MODE));
+        if (testMode != null) {
+            BidMachine.setTestMode(testMode);
         }
-
-        String sellerId = serverExtras.get(SELLER_ID);
-        if (TextUtils.isEmpty(sellerId)) {
-            sellerId = (String) localExtras.get(SELLER_ID);
+        Boolean coppa = parseBoolean(extras.get(COPPA));
+        if (coppa != null) {
+            BidMachine.setCoppa(coppa);
         }
-        if (TextUtils.isEmpty(sellerId)) {
-            sellerId = BidMachineUtils.sellerId;
+        BidMachineUtils.updateGDPR();
+        if (!isInitialized) {
+            String sellerId = parseString(extras.get(SELLER_ID));
+            if (!TextUtils.isEmpty(sellerId)) {
+                BidMachine.initialize(context, sellerId);
+                isInitialized = true;
+                return true;
+            } else {
+                MoPubLog.log(
+                        MoPubLog.AdapterLogEvent.CUSTOM,
+                        BidMachineUtils.class.getSimpleName(),
+                        "seller_id not found anywhere (serverExtras, localExtras, configuration). BidMachine not initialized");
+                return false;
+            }
         }
-        if (!TextUtils.isEmpty(sellerId)) {
-            BidMachineUtils.updateGDPR();
-            BidMachine.initialize(context, sellerId);
-            return true;
-        } else {
-            MoPubLog.log(
-                    MoPubLog.AdapterLogEvent.CUSTOM,
-                    BidMachineUtils.class.getSimpleName(),
-                    "seller_id not found anywhere (serverExtras, localExtras, configuration). BidMachine not initialized");
-        }
-        return false;
+        return true;
     }
 
+    /**
+     * Transform BidMachine error to MoPub error
+     *
+     * @param bmError - BidMachine error object
+     * @return MoPub error object
+     */
     static MoPubErrorCode transformToMoPubErrorCode(@NonNull BMError bmError) {
         if (bmError == BMError.NoContent
                 || bmError == BMError.NotLoaded
@@ -82,17 +98,39 @@ class BidMachineUtils {
         }
     }
 
-    static void updateGDPR() {
-        PersonalInfoManager personalInfoManager = MoPub.getPersonalInformationManager();
-        if (personalInfoManager != null) {
-            BidMachine.setSubjectToGDPR(personalInfoManager.gdprApplies());
-            BidMachine.setConsentConfig(
-                    personalInfoManager.canCollectPersonalInformation(),
-                    "");
-        }
+    /**
+     * Prepare fused map from serverExtras, localExtras and configuration
+     *
+     * @param serverExtras - map from server
+     * @param localExtras  - map from local, set with setLocalExtras
+     * @return fused map which must be contains serverExtras, localExtras and configuration
+     */
+    static Map<String, Object> getFusedMap(Map<String, String> serverExtras, Map<String, Object> localExtras) {
+        Map<String, Object> fusedExtras = new HashMap<>();
+        putMap(fusedExtras, configuration);
+        putMap(fusedExtras, localExtras);
+        putMap(fusedExtras, serverExtras);
+        return fusedExtras;
     }
 
     /**
+     * +----------+--------------------------------------------------------------------------------+------------+
+     * |   Key    |                                   Definition                                   | Value type |
+     * +----------+--------------------------------------------------------------------------------+------------+
+     * | userId   | Vendor-specific ID for the user                                                | String     |
+     * | gender   | Gender, one of following: "F", "M", "O"                                        | String     |
+     * | yob      | Year of birth as a 4-digit integer (e.g - 1990)                                | String     |
+     * | keywords | List of keywords, interests, or intents (separated by comma)                   | String     |
+     * | country  | Country of the user's home base (i.e., not necessarily their current location) | String     |
+     * | city     | City of the user's home base (i.e., not necessarily their current location)    | String     |
+     * | zip      | Zip of the user's home base (i.e., not necessarily their current location)     | String     |
+     * | sturl    | App store URL for an installed app; for IQG 2.1 compliance                     | String     |
+     * | paid     | Determines, if it is a free or paid version of the app                         | String     |
+     * | bcat     | Block list of content categories using IDs (separated by comma)                | String     |
+     * | badv     | Block list of advertisers by their domains (separated by comma)                | String     |
+     * | bapps    | Block list of apps where ads are disallowed (separated by comma)               | String     |
+     * +----------+--------------------------------------------------------------------------------+------------+
+     * <p>
      * Map<String, String> extraData = new HashMap<>();
      * extraData.put("userId", "user123");
      * extraData.put("gender", Gender.Female.getOrtbValue());
@@ -106,92 +144,162 @@ class BidMachineUtils {
      * extraData.put("bcat", "IAB-1,IAB-3,IAB-5");
      * extraData.put("badv", "https://domain_1.com,https://domain_2.org");
      * extraData.put("bapps", "application_1,application_2,application_3");
+     *
+     * @param extras - map where are the necessary parameters for targeting
+     * @return TargetingParams with targeting from extras
      */
-    static TargetingParams findTargetingParams(@Nullable Map<String, Object> extras) {
-        if (extras == null) {
-            return null;
-        }
-
-        String userId = (String) extras.get("userId");
-        String gender = (String) extras.get("gender");
-        String birthdayYear = (String) extras.get("yob");
-        String keywords = (String) extras.get("keywords");
-        String country = (String) extras.get("country");
-        String city = (String) extras.get("city");
-        String zip = (String) extras.get("zip");
-        String sturl = (String) extras.get("sturl");
-        String paid = (String) extras.get("paid");
-        String bcat = (String) extras.get("bcat");
-        String badv = (String) extras.get("badv");
-        String bapps = (String) extras.get("bapps");
-
+    static TargetingParams findTargetingParams(@NonNull Map<String, Object> extras) {
         TargetingParams targetingParams = new TargetingParams();
-        targetingParams.setUserId(userId);
-        targetingParams.setGender(parseGender(gender));
-        targetingParams.setBirthdayYear(parseInt(birthdayYear));
-        targetingParams.setKeywords(splitString(keywords));
-        targetingParams.setCountry(country);
-        targetingParams.setCity(city);
-        targetingParams.setZip(zip);
-        targetingParams.setStoreUrl(sturl);
-        targetingParams.setPaid(Boolean.parseBoolean(paid));
-        for (String value : splitString(bcat)) {
-            targetingParams.addBlockedAdvertiserIABCategory(value);
+        String userId = parseString(extras.get("userId"));
+        if (userId != null) {
+            targetingParams.setUserId(userId);
         }
-        for (String value : splitString(badv)) {
-            targetingParams.addBlockedAdvertiserDomain(value);
+        Gender gender = parseGender(extras.get("gender"));
+        if (gender != null) {
+            targetingParams.setGender(gender);
         }
-        for (String value : splitString(bapps)) {
-            targetingParams.addBlockedApplication(value);
+        int birthdayYear = parseInteger(extras.get("yob"));
+        if (birthdayYear > -1) {
+            targetingParams.setBirthdayYear(birthdayYear);
+        }
+        String keywords = parseString(extras.get("keywords"));
+        if (keywords != null) {
+            targetingParams.setKeywords(splitString(keywords));
+        }
+        String country = parseString(extras.get("country"));
+        if (country != null) {
+            targetingParams.setCountry(country);
+        }
+        String city = parseString(extras.get("city"));
+        if (city != null) {
+            targetingParams.setCity(city);
+        }
+        String zip = parseString(extras.get("zip"));
+        if (zip != null) {
+            targetingParams.setZip(zip);
+        }
+        String sturl = parseString(extras.get("sturl"));
+        if (sturl != null) {
+            targetingParams.setStoreUrl(sturl);
+        }
+        Boolean paid = parseBoolean(extras.get("paid"));
+        if (paid != null) {
+            targetingParams.setPaid(paid);
+        }
+        String bcat = parseString(extras.get("bcat"));
+        if (bcat != null) {
+            for (String value : splitString(bcat)) {
+                targetingParams.addBlockedAdvertiserIABCategory(value);
+            }
+        }
+        String badv = parseString(extras.get("badv"));
+        if (badv != null) {
+            for (String value : splitString(badv)) {
+                targetingParams.addBlockedAdvertiserDomain(value);
+            }
+        }
+        String bapps = parseString(extras.get("bapps"));
+        if (bapps != null) {
+            for (String value : splitString(bapps)) {
+                targetingParams.addBlockedApplication(value);
+            }
         }
         return targetingParams;
     }
 
-    static <T> PriceFloorParams findPriceFloorParams(@Nullable Map<String, T> extras) {
-        if (extras == null) {
-            return null;
-        }
-
-//        JSONArray jsonArray = new JSONArray();
-//        try {
-//            jsonArray.put(new JSONObject().put("id1", "1"));
-//            jsonArray.put(new JSONObject().put("id1", "1.2"));
-//            jsonArray.put(new JSONObject().put("id2", "20,04"));
-//            jsonArray.put(new JSONObject().put("id3", 300.006));
-//            jsonArray.put(new JSONObject().put("id4", 1000));
-//            jsonArray.put("1");
-//            jsonArray.put("1.2");
-//            jsonArray.put("20,04");
-//            jsonArray.put(300.006);
-//            jsonArray.put(1000);
-//        } catch (Exception ignore) {
-//
-//        }
-//        Map<String, String> extraData = new HashMap<>();
-//        extraData.put("priceFloors", jsonArray.toString());
-
-        String priceFloors = (String) extras.get("priceFloors");
+    /**
+     * +-------------+---------------------+---------------------+
+     * |     Key     |     Definition      |     Value type      |
+     * +-------------+---------------------+---------------------+
+     * | priceFloors | List of price floor | JSONArray in String |
+     * +-------------+---------------------+---------------------+
+     * <p>
+     * JSONArray jsonArray = new JSONArray();
+     * jsonArray.put(new JSONObject().put("id1", 300.006));
+     * jsonArray.put(new JSONObject().put("id2", 1000));
+     * jsonArray.put(302.006);
+     * jsonArray.put(1002);
+     * <p>
+     * Map<String, String> extraData = new HashMap<>();
+     * extraData.put("priceFloors", jsonArray.toString());
+     *
+     * @param extras - map where are the necessary parameters for price floor
+     * @return PriceFloorParams with price floors from extras
+     */
+    static <T> PriceFloorParams findPriceFloorParams(@NonNull Map<String, T> extras) {
+        String priceFloors = parseString(extras.get("priceFloors"));
         return createPriceFloorParams(priceFloors);
     }
 
-    private static Gender parseGender(String ortbValue) {
+    /**
+     * Update GDPR state
+     */
+    private static void updateGDPR() {
+        PersonalInfoManager personalInfoManager = MoPub.getPersonalInformationManager();
+        if (personalInfoManager != null) {
+            BidMachine.setSubjectToGDPR(personalInfoManager.gdprApplies());
+            BidMachine.setConsentConfig(
+                    personalInfoManager.canCollectPersonalInformation(),
+                    "");
+        }
+    }
+
+    private static void putMap(Map<String, Object> fusedMap, Map<String, ?> map) {
+        if (fusedMap == null || map == null) {
+            return;
+        }
+        try {
+            fusedMap.putAll(map);
+        } catch (Exception ignore) {
+
+        }
+    }
+
+    private static Boolean parseBoolean(Object object) {
+        if (object instanceof Boolean) {
+            return (Boolean) object;
+        } else if (object instanceof String) {
+            return Boolean.parseBoolean((String) object);
+        } else {
+            return null;
+        }
+    }
+
+    private static String parseString(Object object) {
+        if (object instanceof String) {
+            return (String) object;
+        } else {
+            return null;
+        }
+    }
+
+    static int parseInteger(Object object) {
+        if (object instanceof Integer) {
+            return (int) object;
+        } else if (object instanceof Double) {
+            return ((Double) object).intValue();
+        } else if (object instanceof String) {
+            try {
+                return Integer.parseInt((String) object);
+            } catch (Exception e) {
+                return -1;
+            }
+        } else {
+            return -1;
+        }
+    }
+
+    private static Gender parseGender(Object object) {
+        String ortbValue = parseString(object);
+        if (ortbValue == null) {
+            return null;
+        }
         if (Gender.Female.getOrtbValue().equals(ortbValue)) {
             return Gender.Female;
         } else if (Gender.Male.getOrtbValue().equals(ortbValue)) {
             return Gender.Male;
         } else {
             return Gender.Omitted;
-        }
-    }
-
-    private static Integer parseInt(String value) {
-        if (TextUtils.isEmpty(value)) {
-            return null;
-        }
-        try {
-            return Integer.valueOf(value);
-        } catch (Exception e) {
-            return null;
         }
     }
 
@@ -206,7 +314,7 @@ class BidMachineUtils {
         }
     }
 
-    private static PriceFloorParams createPriceFloorParams(String jsonArrayString) {
+    private static PriceFloorParams createPriceFloorParams(@Nullable String jsonArrayString) {
         PriceFloorParams priceFloorParams = new PriceFloorParams();
         if (TextUtils.isEmpty(jsonArrayString)) {
             return priceFloorParams;
@@ -216,14 +324,20 @@ class BidMachineUtils {
             JSONArray jsonArray = new JSONArray(jsonArrayString);
             for (int i = 0; i < jsonArray.length(); i++) {
                 Object object = jsonArray.opt(i);
-                if (object instanceof Double) {
-                    priceFloorParams.addPriceFloor((Double) object);
-                } else if (object instanceof JSONObject) {
+                if (object instanceof JSONObject) {
                     JSONObject jsonObject = (JSONObject) object;
-                    String id = jsonObject.optString("id");
-                    double price = jsonObject.optDouble("price", -1);
-                    if (!TextUtils.isEmpty(id) && price >= 0) {
-                        priceFloorParams.addPriceFloor(id, price);
+                    Iterator<String> iterator = jsonObject.keys();
+                    while (iterator.hasNext()) {
+                        String id = iterator.next();
+                        double price = parsePrice(jsonObject.opt(id));
+                        if (!TextUtils.isEmpty(id) && price > -1) {
+                            priceFloorParams.addPriceFloor(id, price);
+                        }
+                    }
+                } else {
+                    double price = parsePrice(object);
+                    if (price > -1) {
+                        priceFloorParams.addPriceFloor(price);
                     }
                 }
             }
@@ -232,6 +346,31 @@ class BidMachineUtils {
         }
 
         return priceFloorParams;
+    }
+
+    private static double parsePrice(Object object) {
+        if (object instanceof Double) {
+            return (double) object;
+        } else if (object instanceof Integer) {
+            return ((Integer) object).doubleValue();
+        } else if (object instanceof String) {
+            return convertToPrice((String) object);
+        }
+        return -1;
+    }
+
+    private static double convertToPrice(String value) {
+        if (!TextUtils.isEmpty(value)) {
+            value = value
+                    .replace(",", ".")
+                    .replace(" ", "");
+            try {
+                return Double.parseDouble(value);
+            } catch (Exception e) {
+                return -1;
+            }
+        }
+        return -1;
     }
 
 }
