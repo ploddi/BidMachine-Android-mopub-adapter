@@ -10,7 +10,7 @@ BidMachine Android adapter for MoPub mediation
 
 
 Local SDK configuration sample:
-<
+```java
 //Prepare priceFloors for BidMachine
 JSONArray jsonArray = new JSONArray();
 try {
@@ -50,11 +50,11 @@ SdkConfiguration sdkConfiguration = new SdkConfiguration.Builder(AD_UNIT_ID)
                 BidMachineAdapterConfiguration.class.getName(),
                 configuration)
         .build();
->
+```
 
 
 Server Banner configuration sample:
-<
+```json
 {
     "seller_id": "1",
     "coppa": "true",
@@ -82,10 +82,10 @@ Server Banner configuration sample:
         1002
     ]
 }
->
+```
 
 Local Banner configuration sample:
-<
+```java
 //Prepare priceFloors for BidMachine
 JSONArray jsonArray = new JSONArray();
 try {
@@ -128,10 +128,10 @@ moPubView.setAutorefreshEnabled(false);
 moPubView.setAdUnitId(BANNER_KEY);
 moPubView.setBannerAdListener(new BannerViewListener());
 moPubView.loadAd();
->
+```
 
 Server Interstitial configuration sample:
-<
+```json
 {
     "seller_id": "1",
     "coppa": "true",
@@ -159,10 +159,10 @@ Server Interstitial configuration sample:
         1002
     ]
 }
->
+```
 
 Local Interstitial configuration sample:
-<
+```java
 //Prepare priceFloors for BidMachine
 JSONArray jsonArray = new JSONArray();
 try {
@@ -200,10 +200,10 @@ moPubInterstitial = new MoPubInterstitial(this, INTERSTITIAL_KEY);
 moPubInterstitial.setLocalExtras(localExtras);
 moPubInterstitial.setInterstitialAdListener(new InterstitialListener());
 moPubInterstitial.load();
->
+```
 
 Server RewardedVideo configuration sample:
-<
+```json
 {
     "seller_id": "1",
     "coppa": "true",
@@ -230,4 +230,4 @@ Server RewardedVideo configuration sample:
         1002
     ]
 }
->
+```
