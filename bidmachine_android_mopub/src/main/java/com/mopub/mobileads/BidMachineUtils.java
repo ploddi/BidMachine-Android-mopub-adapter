@@ -267,7 +267,7 @@ class BidMachineUtils {
         }
     }
 
-    static String parseString(Object object) {
+    private static String parseString(Object object) {
         if (object instanceof String) {
             return (String) object;
         } else {
