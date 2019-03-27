@@ -1,11 +1,10 @@
 package io.bidmachine.examples;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
@@ -26,7 +25,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class BidMachineMoPubActivity extends AppCompatActivity {
+public class BidMachineMoPubActivity extends Activity {
 
     private static final String TAG = "MainActivity";
     private static final String AD_UNIT_ID = "4068bca9a3a44977917d68338b75df64";
@@ -52,47 +51,17 @@ public class BidMachineMoPubActivity extends AppCompatActivity {
 
         bannerContainer = findViewById(R.id.banner_container);
         btnLoadBanner = findViewById(R.id.load_banner);
-        btnLoadBanner.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                loadBanner();
-            }
-        });
+        btnLoadBanner.setOnClickListener(v -> loadBanner());
         btnShowBanner = findViewById(R.id.show_banner);
-        btnShowBanner.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showBanner();
-            }
-        });
+        btnShowBanner.setOnClickListener(v -> showBanner());
         btnLoadInterstitial = findViewById(R.id.load_interstitial);
-        btnLoadInterstitial.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                loadInterstitial();
-            }
-        });
+        btnLoadInterstitial.setOnClickListener(v -> loadInterstitial());
         btnShowInterstitial = findViewById(R.id.show_interstitial);
-        btnShowInterstitial.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showInterstitial();
-            }
-        });
+        btnShowInterstitial.setOnClickListener(v -> showInterstitial());
         btnLoadRewardedVideo = findViewById(R.id.load_rvideo);
-        btnLoadRewardedVideo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                loadRewardedVideo();
-            }
-        });
+        btnLoadRewardedVideo.setOnClickListener(v -> loadRewardedVideo());
         btnShowRewardedVideo = findViewById(R.id.show_rvideo);
-        btnShowRewardedVideo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showRewardedVideo();
-            }
-        });
+        btnShowRewardedVideo.setOnClickListener(v -> showRewardedVideo());
 
         initialize();
     }
