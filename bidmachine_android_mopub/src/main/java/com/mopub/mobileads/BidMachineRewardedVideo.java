@@ -30,14 +30,18 @@ public class BidMachineRewardedVideo extends CustomEventRewardedVideo {
     }
 
     @Override
-    protected boolean checkAndInitializeSdk(@NonNull Activity launcherActivity, @NonNull Map<String, Object> localExtras, @NonNull Map<String, String> serverExtras) throws Exception {
+    protected boolean checkAndInitializeSdk(@NonNull Activity launcherActivity,
+                                            @NonNull Map<String, Object> localExtras,
+                                            @NonNull Map<String, String> serverExtras) throws Exception {
         return BidMachineUtils.prepareBidMachine(
                 launcherActivity,
                 BidMachineUtils.getFusedMap(serverExtras, localExtras));
     }
 
     @Override
-    protected void loadWithSdkInitialized(@NonNull Activity activity, @NonNull Map<String, Object> localExtras, @NonNull Map<String, String> serverExtras) throws Exception {
+    protected void loadWithSdkInitialized(@NonNull Activity activity,
+                                          @NonNull Map<String, Object> localExtras,
+                                          @NonNull Map<String, String> serverExtras) throws Exception {
         adUnitId = UUID.randomUUID().toString();
         Map<String, Object> fusedMap = BidMachineUtils.getFusedMap(serverExtras, localExtras);
         BidMachineUtils.prepareBidMachine(activity, fusedMap);
