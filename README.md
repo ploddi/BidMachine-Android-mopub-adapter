@@ -1,6 +1,28 @@
 # BidMachine-Android-mopub-adapter
 BidMachine Android adapter for MoPub mediation
 
+## Integration:
+```gradle
+repositories {
+    //Add BidMachine maven repository
+    maven {
+        url 'https://artifactory.appodeal.com/artifactory/bidmachine'
+    }
+}
+
+dependencies {
+    //Add BidMachine SDK dependency
+    implementation 'io.bidmachine:ads:1.0.2'
+    //Add BidMachine SDK Mopub dependency
+    implementation 'io.bidmachine:ads.mopub:1.0.2'
+    //Add Mopub SDK dependency
+    implementation('com.mopub:mopub-sdk:5.6.0@aar') {
+        transitive = true
+    }
+    ...
+}
+```
+
 ## Examples:
 
 #### Initialize: [Sample](example/src/main/java/io/bidmachine/examples/BidMachineMoPubActivity.java#L80)
