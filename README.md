@@ -13,8 +13,8 @@ repositories {
 dependencies {
     //Add BidMachine SDK dependency
     implementation 'io.bidmachine:ads:1.0.2'
-    //Add BidMachine SDK Mopub dependency
-    implementation 'io.bidmachine:ads.mopub:1.0.2'
+    //Add BidMachine SDK Mopub Adapter dependency
+    implementation 'io.bidmachine:ads-mopub:1.0.2'
     //Add Mopub SDK dependency
     implementation('com.mopub:mopub-sdk:5.6.0@aar') {
         transitive = true
