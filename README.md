@@ -31,9 +31,10 @@ dependencies {
 #### Load Rewarded Video: [Sample](example/src/main/java/io/bidmachine/examples/BidMachineMoPubActivity.java#L222)
 
 
-Local SDK configuration sample:
-|   Key       |                                   Definition                                   | Value type          |
-|-------------|--------------------------------------------------------------------------------|---------------------|
+Parameter list for local and server configuretion:
+
+| Key         |                                   Definition                                   | Value type          |
+| ----------- | ------------------------------------------------------------------------------ | ------------------- |
 | userId      | Vendor-specific ID for the user                                                | String              |
 | gender      | Gender, one of following: "F", "M", "O"                                        | String              |
 | yob         | Year of birth as a 4-digit integer (e.g - 1990)                                | String              |
@@ -47,6 +48,8 @@ Local SDK configuration sample:
 | badv        | Block list of advertisers by their domains (separated by comma)                | String              |
 | bapps       | Block list of apps where ads are disallowed (separated by comma)               | String              |
 | priceFloors | List of price floor                                                            | JSONArray in String |
+
+Local SDK configuration sample:
 ```java
 //Prepare priceFloors for BidMachine
 JSONArray jsonArray = new JSONArray();
