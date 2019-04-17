@@ -31,10 +31,10 @@ dependencies {
 #### Load Rewarded Video: [Sample](example/src/main/java/io/bidmachine/examples/BidMachineMoPubActivity.java#L222)
 
 
-Parameter list for local and server configuretion:
+List of parameters for local and server configuration:
 
 | Key         |                                   Definition                                   | Value type          |
-| ----------- | ------------------------------------------------------------------------------ | ------------------- |
+|:----------- |:------------------------------------------------------------------------------ |:------------------- |
 | userId      | Vendor-specific ID for the user                                                | String              |
 | gender      | Gender, one of following: "F", "M", "O"                                        | String              |
 | yob         | Year of birth as a 4-digit integer (e.g - 1990)                                | String              |
