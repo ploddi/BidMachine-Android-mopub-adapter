@@ -32,7 +32,6 @@ dependencies {
 
 
 Local SDK configuration sample:
-|-------------|--------------------------------------------------------------------------------|---------------------|
 |   Key       |                                   Definition                                   | Value type          |
 |-------------|--------------------------------------------------------------------------------|---------------------|
 | userId      | Vendor-specific ID for the user                                                | String              |
@@ -48,7 +47,6 @@ Local SDK configuration sample:
 | badv        | Block list of advertisers by their domains (separated by comma)                | String              |
 | bapps       | Block list of apps where ads are disallowed (separated by comma)               | String              |
 | priceFloors | List of price floor                                                            | JSONArray in String |
-|-------------|--------------------------------------------------------------------------------|---------------------|
 ```java
 //Prepare priceFloors for BidMachine
 JSONArray jsonArray = new JSONArray();
