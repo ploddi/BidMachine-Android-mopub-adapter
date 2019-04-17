@@ -32,6 +32,23 @@ dependencies {
 
 
 Local SDK configuration sample:
+|-------------|--------------------------------------------------------------------------------|---------------------|
+|   Key       |                                   Definition                                   | Value type          |
+|-------------|--------------------------------------------------------------------------------|---------------------|
+| userId      | Vendor-specific ID for the user                                                | String              |
+| gender      | Gender, one of following: "F", "M", "O"                                        | String              |
+| yob         | Year of birth as a 4-digit integer (e.g - 1990)                                | String              |
+| keywords    | List of keywords, interests, or intents (separated by comma)                   | String              |
+| country     | Country of the user's home base (i.e., not necessarily their current location) | String              |
+| city        | City of the user's home base (i.e., not necessarily their current location)    | String              |
+| zip         | Zip of the user's home base (i.e., not necessarily their current location)     | String              |
+| sturl       | App store URL for an installed app; for IQG 2.1 compliance                     | String              |
+| paid        | Determines, if it is a free or paid version of the app                         | String              |
+| bcat        | Block list of content categories using IDs (separated by comma)                | String              |
+| badv        | Block list of advertisers by their domains (separated by comma)                | String              |
+| bapps       | Block list of apps where ads are disallowed (separated by comma)               | String              |
+| priceFloors | List of price floor                                                            | JSONArray in String |
+|-------------|--------------------------------------------------------------------------------|---------------------|
 ```java
 //Prepare priceFloors for BidMachine
 JSONArray jsonArray = new JSONArray();
@@ -253,3 +270,37 @@ Server RewardedVideo configuration sample:
     ]
 }
 ```
+
+LICENSE
+=======
+
+Copyright (c) 2018, Appodeal, Inc.<br/>
+All rights reserved.<br/>
+Provided under BSD-3 license as follows:<br/>
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+1.  Redistributions of source code must retain the above copyright notice,
+   this list of conditions and the following disclaimer.
+
+2.  Redistributions in binary form must reproduce the above copyright
+   notice, this list of conditions and the following disclaimer in the
+   documentation and/or other materials provided with the distribution.
+
+3.  Neither the name of Appodeal nor the names of its
+   contributors may be used to endorse or promote products derived from
+   this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
+IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
