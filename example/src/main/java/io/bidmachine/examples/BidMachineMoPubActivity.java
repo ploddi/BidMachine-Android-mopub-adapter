@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 
 import com.mopub.common.MoPub;
 import com.mopub.common.MoPubReward;
@@ -256,16 +257,24 @@ public class BidMachineMoPubActivity extends Activity {
     /**
      * Class for definition behavior MoPubView
      */
-    private static class BannerViewListener implements MoPubView.BannerAdListener {
+    private class BannerViewListener implements MoPubView.BannerAdListener {
 
         @Override
         public void onBannerLoaded(MoPubView banner) {
             Log.d(TAG, "MoPubView onBannerLoaded");
+            Toast.makeText(
+                    BidMachineMoPubActivity.this,
+                    "BannerLoaded",
+                    Toast.LENGTH_SHORT).show();
         }
 
         @Override
         public void onBannerFailed(MoPubView banner, MoPubErrorCode errorCode) {
             Log.d(TAG, "MoPubView onBannerFailed with errorCode - " + errorCode.getIntCode() + " (" + errorCode.toString() + ")");
+            Toast.makeText(
+                    BidMachineMoPubActivity.this,
+                    "BannerFailedToLoad",
+                    Toast.LENGTH_SHORT).show();
         }
 
         @Override
@@ -288,16 +297,24 @@ public class BidMachineMoPubActivity extends Activity {
     /**
      * Class for definition behavior MoPubInterstitial
      */
-    private static class InterstitialListener implements MoPubInterstitial.InterstitialAdListener {
+    private class InterstitialListener implements MoPubInterstitial.InterstitialAdListener {
 
         @Override
         public void onInterstitialLoaded(MoPubInterstitial interstitial) {
             Log.d(TAG, "MoPubInterstitial onInterstitialLoaded");
+            Toast.makeText(
+                    BidMachineMoPubActivity.this,
+                    "InterstitialLoaded",
+                    Toast.LENGTH_SHORT).show();
         }
 
         @Override
         public void onInterstitialFailed(MoPubInterstitial interstitial, MoPubErrorCode errorCode) {
             Log.d(TAG, "MoPubInterstitial onInterstitialFailed with errorCode - " + errorCode.getIntCode() + " (" + errorCode.toString() + ")");
+            Toast.makeText(
+                    BidMachineMoPubActivity.this,
+                    "InterstitialFailedToLoad",
+                    Toast.LENGTH_SHORT).show();
         }
 
         @Override
@@ -320,16 +337,24 @@ public class BidMachineMoPubActivity extends Activity {
     /**
      * Class for definition behavior MoPubRewardedVideos
      */
-    private static class RewardedVideoListener implements MoPubRewardedVideoListener {
+    private class RewardedVideoListener implements MoPubRewardedVideoListener {
 
         @Override
         public void onRewardedVideoLoadSuccess(@NonNull String adUnitId) {
             Log.d(TAG, "MoPubRewardedVideos onRewardedVideoLoadSuccess");
+            Toast.makeText(
+                    BidMachineMoPubActivity.this,
+                    "RewardedVideoLoaded",
+                    Toast.LENGTH_SHORT).show();
         }
 
         @Override
         public void onRewardedVideoLoadFailure(@NonNull String adUnitId, @NonNull MoPubErrorCode errorCode) {
             Log.d(TAG, "MoPubRewardedVideos onRewardedVideoLoadFailure with errorCode - " + errorCode.getIntCode() + " (" + errorCode.toString() + ")");
+            Toast.makeText(
+                    BidMachineMoPubActivity.this,
+                    "RewardedVideoFailedToLoad",
+                    Toast.LENGTH_SHORT).show();
         }
 
         @Override
