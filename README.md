@@ -33,8 +33,13 @@ dependencies {
 
 List of parameters for local and server configuration:
 
-| Key         |                                   Definition                                   | Value type          |
-|:----------- |:------------------------------------------------------------------------------ |:------------------- |
+| Key         | Definition | Value type |
+|:----------- |:---------- |:---------- |
+| seller_id       | You unique seller id. To get your Seller Id or for more info please visit https://bidmachine.io/ | String |
+| coppa           | Flag indicating if COPPA regulations can be applied. The Children's Online Privacy Protection Act (COPPA) was established by the U.S. Federal Trade Commission. | String |
+| logging_enabled | Enable logs if required | String |
+| test_mode       | Enable test mode | String |
+| ad_content_type | Content type for interstitial ad, one of following: "All", "Static", "Video"   | String              |
 | userId      | Vendor-specific ID for the user                                                | String              |
 | gender      | Gender, one of following: "F", "M", "O"                                        | String              |
 | yob         | Year of birth as a 4-digit integer (e.g - 1990)                                | String              |
@@ -64,18 +69,18 @@ try {
 
 //Prepare configuration map for BidMachineAdapterConfiguration
 Map<String, String> configuration = new HashMap<>();
-configuration.put("seller_id", "1");
+configuration.put("seller_id", "YOUR_SELLER_ID");
 configuration.put("coppa", "true");
 configuration.put("logging_enabled", "true");
 configuration.put("test_mode", "true");
 configuration.put("banner_width", "320");
-configuration.put("userId", "user123");
+configuration.put("userId", "YOUR_USER_ID");
 configuration.put("gender", "F");
 configuration.put("yob", "2000");
 configuration.put("keywords", "Keyword_1,Keyword_2,Keyword_3,Keyword_4");
-configuration.put("country", "Russia");
-configuration.put("city", "Kirov");
-configuration.put("zip", "610000");
+configuration.put("country", "YOUR_COUNTRY");
+configuration.put("city", "YOUR_CITY");
+configuration.put("zip", "YOUR_ZIP");
 configuration.put("sturl", "https://store_url.com");
 configuration.put("paid", "true");
 configuration.put("bcat", "IAB-1,IAB-3,IAB-5");
@@ -96,18 +101,18 @@ SdkConfiguration sdkConfiguration = new SdkConfiguration.Builder(AD_UNIT_ID)
 Server Banner configuration sample:
 ```json
 {
-    "seller_id": "1",
+    "seller_id": "YOUR_SELLER_ID",
     "coppa": "true",
     "logging_enabled": "true",
     "test_mode": "true",
     "banner_width": "320",
-    "userId": "user123",
+    "userId": "YOUR_USER_ID",
     "gender": "F",
     "yob": "2000",
     "keywords": "Keyword_1,Keyword_2,Keyword_3,Keyword_4",
-    "country": "Russia",
-    "city": "Kirov",
-    "zip": "610000",
+    "country": "YOUR_COUNTRY",
+    "city": "YOUR_CITY",
+    "zip": "YOUR_ZIP",
     "sturl": "https://store_url.com",
     "paid": "true",
     "bcat": "IAB-1,IAB-3,IAB-5",
@@ -139,18 +144,18 @@ try {
 
 //Prepare localExtras for MoPubView
 Map<String, String> localExtras = new HashMap<>();
-localExtras.put("seller_id", "1");
+localExtras.put("seller_id", "YOUR_SELLER_ID");
 localExtras.put("coppa", "true");
 localExtras.put("logging_enabled", "true");
 localExtras.put("test_mode", "true");
 localExtras.put("banner_width", "320");
-localExtras.put("userId", "user123");
+localExtras.put("userId", "YOUR_USER_ID");
 localExtras.put("gender", "F");
 localExtras.put("yob", "2000");
 localExtras.put("keywords", "Keyword_1,Keyword_2,Keyword_3,Keyword_4");
-localExtras.put("country", "Russia");
-localExtras.put("city", "Kirov");
-localExtras.put("zip", "610000");
+localExtras.put("country", "YOUR_COUNTRY");
+localExtras.put("city", "YOUR_CITY");
+localExtras.put("zip", "YOUR_ZIP");
 localExtras.put("sturl", "https://store_url.com");
 localExtras.put("paid", "true");
 localExtras.put("bcat", "IAB-1,IAB-3,IAB-5");
@@ -173,18 +178,18 @@ moPubView.loadAd();
 Server Interstitial configuration sample:
 ```json
 {
-    "seller_id": "1",
+    "seller_id": "YOUR_SELLER_ID",
     "coppa": "true",
     "logging_enabled": "true",
     "test_mode": "true",
     "ad_content_type": "All",
-    "userId": "user123",
+    "userId": "YOUR_USER_ID",
     "gender": "F",
     "yob": "2000",
     "keywords": "Keyword_1,Keyword_2,Keyword_3,Keyword_4",
-    "country": "Russia",
-    "city": "Kirov",
-    "zip": "610000",
+    "country": "YOUR_COUNTRY",
+    "city": "YOUR_CITY",
+    "zip": "YOUR_ZIP",
     "sturl": "https://store_url.com",
     "paid": "true",
     "bcat": "IAB-1,IAB-3,IAB-5",
@@ -216,18 +221,18 @@ try {
 
 //Prepare localExtras for MoPubInterstitial
 Map<String, String> localExtras = new HashMap<>();
-localExtras.put("seller_id", "1");
+localExtras.put("seller_id", "YOUR_SELLER_ID");
 localExtras.put("coppa", "true");
 localExtras.put("logging_enabled", "true");
 localExtras.put("test_mode", "true");
 localExtras.put("banner_width", "320");
-localExtras.put("userId", "user123");
+localExtras.put("userId", "YOUR_USER_ID");
 localExtras.put("gender", "F");
 localExtras.put("yob", "2000");
 localExtras.put("keywords", "Keyword_1,Keyword_2,Keyword_3,Keyword_4");
-localExtras.put("country", "Russia");
-localExtras.put("city", "Kirov");
-localExtras.put("zip", "610000");
+localExtras.put("country", "YOUR_COUNTRY");
+localExtras.put("city", "YOUR_CITY");
+localExtras.put("zip", "YOUR_ZIP");
 localExtras.put("sturl", "https://store_url.com");
 localExtras.put("paid", "true");
 localExtras.put("bcat", "IAB-1,IAB-3,IAB-5");
@@ -245,17 +250,17 @@ moPubInterstitial.load();
 Server RewardedVideo configuration sample:
 ```json
 {
-    "seller_id": "1",
+    "seller_id": "YOUR_SELLER_ID",
     "coppa": "true",
     "logging_enabled": "true",
     "test_mode": "true",
-    "userId": "user123",
+    "userId": "YOUR_USER_ID",
     "gender": "F",
     "yob": "2000",
     "keywords": "Keyword_1,Keyword_2,Keyword_3,Keyword_4",
-    "country": "Russia",
-    "city": "Kirov",
-    "zip": "610000",
+    "country": "YOUR_COUNTRY",
+    "city": "YOUR_CITY",
+    "zip": "YOUR_ZIP",
     "sturl": "https://store_url.com",
     "paid": "true",
     "bcat": "IAB-1,IAB-3,IAB-5",
